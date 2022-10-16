@@ -1,4 +1,7 @@
 FUNCTION sum(n1,n2)
-    res = 1 + 1
-    return(n1 + n2 + res)
+    return(n1 + n2)
 END FUNCTION
+
+FOR i = 0 TO 9
+    print(sum(10-i*2, i))
+NEXT i

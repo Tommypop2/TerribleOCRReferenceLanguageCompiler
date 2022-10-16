@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <time.h>
 #include <string>
@@ -13,12 +14,12 @@ int len(std::vector<int> lst)
 {
     return lst.size();
 }
-auto sum(int n1, int n2)
-{
-    auto res = 1 + 1;
-    return (n1 + n2 + res);
-}
+auto sum(int n1,int n2){return(n1 + n2);}
 int main()
 {
     std::srand(time(0));
+	
+
+	for(auto i = 0; i < 9; i++){std::cout << sum(10-i*2, i) << '\n';}
+
 }

@@ -12,10 +12,10 @@ def main():
     else:
         fileName = fileArgs[0]
     compiler.main(fileName)
-    os.system("g++ main.cpp")
+    os.system("g++ main.cpp -o output.exe")
     print("Compilation Successful")
     # os.system("del main.cpp")
-    os.system("a.exe")
+    os.system("output.exe")
 
 
 if __name__ == "__main__":
