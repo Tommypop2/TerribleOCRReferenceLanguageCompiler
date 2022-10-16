@@ -139,15 +139,18 @@ def generateCPPForLoop(statement: list[str]):
         for i in parsedContents:
             parsedContentsString += i
     return f"for({parsedVariableAssignment} {assignedVariableName} < {parsedLimit}; {parsedVariableToIncrement}++)" + "{" + parsedContentsString + "}"
+
+
 def generateCPPFunction(statement: list):
     return ""
+
 
 def parseStatement(statement: list) -> str:
     # if (len(statement) > 1 and statement[0] == '"' and statement[len(statement) - 1] == '"'):
     #     return statement
     if (len(statement) < 1):
         return ""
-    if("FUNCTION" in statement[0] and "END FUNCTION" in statement[len(statement) - 1]):
+    if ("FUNCTION" in statement[0] and "END FUNCTION" in statement[len(statement) - 1]):
         return generateCPPFunction(statement)
     if ("IF" in statement[0] and "THEN" in statement[0]):
         return generateCPPIfStatement(statement)
