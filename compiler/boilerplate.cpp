@@ -13,8 +13,9 @@ int len(std::vector<int> lst)
 {
     return lst.size();
 }
+void extraFunctionDeclarations(){}
 int main()
 {
     std::srand(time(0));
-    "actualCode";
+"actualCode";
 }

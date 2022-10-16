@@ -1,4 +1,5 @@
 import json
+from compiler.convertToStatements import convertToStatements
 initialisedVariables = []
 typeAliases = {str.__name__: "std::string", int.__name__: "std::int",
                list[str].__name__: "std::vector<std::string>", list[int].__name__: "std::vector<int>"}
@@ -24,13 +25,13 @@ def generateCPPAssignment(statement: list):
 
 
 def generateCPPFunctionCall(statement: list):
-    functionName = statement[0].split("(")[0]
+    functionName = statement[0].split("(")[0].strip()
     functionArgument = ""
     temp = statement[0].replace(functionName, "")
     for i in range(len(temp)):
         if (i != 0 and i != len(temp) - 1):
             functionArgument += temp[i]
-    functionArgument = parseStatement([functionArgument])
+    functionArgument = parseStatement([functionArgument]).strip()
     if (functionName == "print"):
         return f"std::cout << {functionArgument} << '\\n';"
     elif (functionName == "input"):
@@ -43,6 +44,8 @@ def generateCPPFunctionCall(statement: list):
         return f"""
         ({offset} + (rand() % {numRange}))
         """
+    elif (functionName == "return"):
+        return f"return{functionArgument};"
     return ""
 
 
@@ -141,8 +144,23 @@ def generateCPPForLoop(statement: list[str]):
     return f"for({parsedVariableAssignment} {assignedVariableName} < {parsedLimit}; {parsedVariableToIncrement}++)" + "{" + parsedContentsString + "}"
 
 
-def generateCPPFunction(statement: list):
-    return ""
+def generateCPPFunction(statement: list[str]):
+    functionName = statement[0].split("FUNCTION")[1].split("(")[0].strip()
+    functionParameters = list(
+        map(lambda x: x.strip(), statement[0].split("(")[1].split(")")[0].split(",")))
+    functionParametersString = ""
+    for i in range(len(functionParameters)):
+        if (i < (len(functionParameters) - 1)):
+            functionParametersString += f"int {functionParameters[i]},"
+        else:
+            functionParametersString += f"int {functionParameters[i]}"
+    functionContents = statement[1: len(statement) - 1]
+    parsedContents = list(
+        map(lambda x: parseStatement([x]).strip(), functionContents))
+    parsedContentsString = ""
+    for i in parsedContents:
+        parsedContentsString += i
+    return f"auto {functionName}({functionParametersString})" + "{" + f"{parsedContentsString}" + "}"
 
 
 def parseStatement(statement: list) -> str:
@@ -162,7 +180,7 @@ def parseStatement(statement: list) -> str:
         return generateCPPAssignment(statement)
     if (">" in statement[0] or "<" in statement[0] or "==" in statement[0] or "!=" in statement[0]):
         return generateCPPComparison(statement)
-    if (statement[0].__contains__("print") or "random" in statement[0] or "input" in statement[0]):
+    if (statement[0].__contains__("print") or "random" in statement[0] or "input" in statement[0] or "return" in statement[0]):
         return generateCPPFunctionCall(statement)
     if (statement[0] == "break"):
         return "break;"

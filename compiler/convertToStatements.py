@@ -104,5 +104,4 @@ def convertToStatements(contents: list[str]):
     statements = convertWhilesToStatements(statements)
     statements = convertForsToStatements(statements)
     statements = convertEverythingToStatements(statements)
-    print(statements)
     return statements

@@ -17,10 +17,11 @@ int len(std::vector<int> lst)
 {
     return lst.size();
 }
+void extraFunctionDeclarations(){}
 int main()
 {
     std::srand(time(0));
-    "actualCode";
+"actualCode";
 }
 """
 
@@ -46,17 +47,22 @@ def getFunctions(contents: list[str]):
     
     return contents, functionsList
 
+def convertFunctions(functions: list[list[str]]):
+    convertedString = ""
 
+    for i in functions:
+        convertedString += parse.parseStatement(i)
+    return convertedString
 def main(filePath):
     contents = getContents(filePath)
     contents, functions = getFunctions(contents)
-    print(functions)
+    convertedFunctions = convertFunctions(functions)
     statements = convertToStatements(contents)
     cppCode = parse.parse(statements)
     # with open("compiler/boilerplate.cpp", "r") as f:
     #     boilerPlate = f.read()
     with open("main.cpp", "w") as f:
-        stuffToWrite = boilerPlate.replace('"actualCode";', cppCode)
+        stuffToWrite = boilerPlate.replace('"actualCode";', cppCode).replace("void extraFunctionDeclarations(){}", convertedFunctions)
         f.write(stuffToWrite)
 
 

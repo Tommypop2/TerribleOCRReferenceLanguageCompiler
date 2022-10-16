@@ -14,8 +14,9 @@ int len(std::vector<int> lst)
 {
     return lst.size();
 }
+auto sum(int n1,int n2){auto res = 1 + 1;return(n1 + n2 + res);}
 int main()
 {
     std::srand(time(0));
-    
+
 }
