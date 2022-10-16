@@ -1,5 +1,4 @@
 import json
-from compiler.convertToStatements import convertToStatements
 initialisedVariables = []
 typeAliases = {str.__name__: "std::string", int.__name__: "std::int",
                list[str].__name__: "std::vector<std::string>", list[int].__name__: "std::vector<int>"}
