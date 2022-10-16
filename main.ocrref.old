@@ -1,0 +1,21 @@
+y = 3 + 1
+
+IF y > 2 THEN
+    print("Hello World")
+    print("Goodbye World")
+END IF
+
+IF y < 10 THEN
+    print("Y is 3")
+END IF
+
+WHILE y < 5
+    print("Y is below 5")
+    y = y + 1
+END WHILE
+
+FOR i = 0 TO 9
+    print(i)
+NEXT i
+
+print(random(1,10))
