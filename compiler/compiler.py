@@ -34,7 +34,7 @@ def getContents(fileName):
 
 def getFunctions(contents: list[str]):
     functions = list(zip(getIndexes("FUNCTION", contents),
-                    getIndexes("END FUNCTION", contents)))
+                         getIndexes("END FUNCTION", contents)))
     functionsList = []
     for i in functions:
         functionsList.append(contents[i[0]:i[1] + 1])
@@ -44,8 +44,9 @@ def getFunctions(contents: list[str]):
             indexesToRemove.append(n)
     for i in sorted(indexesToRemove, reverse=True):
         del contents[i]
-    
+
     return contents, functionsList
+
 
 def convertFunctions(functions: list[list[str]]):
     convertedString = ""
@@ -53,6 +54,8 @@ def convertFunctions(functions: list[list[str]]):
     for i in functions:
         convertedString += parse.parseStatement(i)
     return convertedString
+
+
 def main(filePath):
     contents = getContents(filePath)
     contents, functions = getFunctions(contents)
@@ -62,7 +65,8 @@ def main(filePath):
     # with open("compiler/boilerplate.cpp", "r") as f:
     #     boilerPlate = f.read()
     with open("main.cpp", "w") as f:
-        stuffToWrite = boilerPlate.replace('"actualCode";', cppCode).replace("void extraFunctionDeclarations(){}", convertedFunctions)
+        stuffToWrite = boilerPlate.replace('"actualCode";', cppCode).replace(
+            "void extraFunctionDeclarations(){}", convertedFunctions)
         f.write(stuffToWrite)
 
 

@@ -91,14 +91,17 @@ def tokenizeContents(loop: str):
         filter(lambda x: x != "", loop.split("\n")))))
     return loopContents
 
+
 def convertEverythingToStatements(statements: list):
     newStatements = []
     for i in statements:
-        if(isinstance(i, str)):
+        if (isinstance(i, str)):
             newStatements.append([i])
         else:
             newStatements.append(i)
     return newStatements
+
+
 def convertToStatements(contents: list[str]):
     statements = convertIfsToStatements(contents)
     statements = convertWhilesToStatements(statements)
