@@ -11,7 +11,7 @@ def main():
         fileName = "main.ocrref"
     else:
         fileName = fileArgs[0]
-    compiler.main(fileName)
+    compiler.compile(fileName)
     os.system("g++ main.cpp -o output.exe")
     print("Compilation Successful")
     # os.system("del main.cpp")
