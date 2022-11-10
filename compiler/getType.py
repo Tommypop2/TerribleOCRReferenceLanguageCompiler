@@ -13,4 +13,6 @@ def getType(statement):
         return "functionEnd"
     if("=" in statement):
         return "assignment"
+    if("(" in statement and ")" in statement):
+        return "functionCall"
     return "misc"

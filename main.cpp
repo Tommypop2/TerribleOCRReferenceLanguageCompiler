@@ -18,11 +18,5 @@ auto sum(int n1, int n2) { return (n1 + n2); }
 int main()
 {
     std::srand(time(0));
-    for (auto i = 0; i < 9; i++)
-    {
-        for (auto n = 1; n < 10; n++)
-        {
-            auto z = 2;
-        }
-    }
+    for(auto i = 0; i<9; i++){for(auto n = 1; n<10; n++){std::cout << n << '\n';}}
 }
