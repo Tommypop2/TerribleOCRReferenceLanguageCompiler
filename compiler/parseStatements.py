@@ -1,9 +1,11 @@
 import json
 from compiler import parseLoops
 from compiler.getType import getType
+from compiler import parseIfStatements
 typeAliases = {str.__name__: "std::string", int.__name__: "std::int",
-               list[str].__name__: "std::vector<std::string>", list[int].__name__: "std::vector<int>"}
+               "list: string": "std::vector<std::string>", "list: int": "std::vector<int>"}
 initialisedVariables = []
+conditions = [">", "<", "==", "!=", ">=", "<="]
 
 
 def generateCppAssignment(statement: str):
@@ -16,10 +18,14 @@ def generateCppAssignment(statement: str):
     if (parsedName in initialisedVariables):
         return f"{parsedName} = {parsedValue};"
     if (parsedValue[0] == "[" and parsedValue[len(parsedValue) - 1] == "]"):
-        typeOfArray = type([int(x) for x in json.loads(parsedValue)])
+        typeOfArray = type(json.loads(parsedValue)[0])
+        if(typeOfArray == str):
+            typeOfArray = "list: string"
+        if(typeOfArray == int):
+            typeOfArray = "list: int"
         parsedValue = parsedValue.replace("[", "{", 1)
         parsedValue = (parsedValue[::1].replace("]", "}"))[::1]
-        variableType = typeAliases[typeOfArray.__name__]
+        variableType = typeAliases[typeOfArray]
     initialisedVariables.append(parsedName)
     return f"{variableType} {parsedName} = {parsedValue};"
 
@@ -35,12 +41,29 @@ def generateCppForLoop(loopStart: tuple[str, str], contents: list[tuple[str, str
     return f"for({parsedAssignment} {variableName}<{parsedLimit}; {variableName}++){{{contents}}}"
 
 
-def generateCppWhileLoop(loopStart, contents):
-    return ""
+def generateCppWhileLoop(loopStart: str, contents):
+    condition = loopStart[0].split("WHILE")[1].strip()
+    parsedCondition = parseStatement((condition, "condition"))
+    return f"while({parsedCondition}) {{{contents}}}"
 
 
-def generateCppIfStatement(statementStart, contents):
-    return ""
+def generateCppComparison(condition: str):
+    operator: str = ""
+    for i, item in enumerate(conditions):
+        if (item in condition):
+            operator = item
+    val = condition.split(operator)
+    val = list(map(lambda x: x.strip(), val))
+    x = parseStatement((val[0], getType(val[0])))
+    y = parseStatement((val[1], getType(val[1])))
+    return f"{x} {operator} {y}"
+
+
+def generateCppIfStatement(statementStart: str, contents):
+    condition = statementStart[0].split("IF")[1].strip()
+    parsedCondition = parseStatement((condition, "comparison"))
+    # print(f"{statementStart}, {contents}")
+    return f"if({parsedCondition}) {{{contents}}}"
 
 
 def generateCppLoop(loopStart, contents):
@@ -48,14 +71,24 @@ def generateCppLoop(loopStart, contents):
         return generateCppForLoop(loopStart, contents)
     if ("while" in loopStart[1]):
         return generateCppWhileLoop(loopStart, contents)
+    if ("if" in loopStart[1]):
+        return generateCppIfStatement(loopStart, contents)
     return ""
 
 
 def generateCppFunctionCall(statement: str):
     argument = statement.split("(")[1].split(")")[0]
     parsedArgument = parseStatement((argument, getType(argument)))
-    if(statement.split("(")[0].strip() == "print"):
+    if (statement.split("(")[0].strip() == "print"):
         return f"std::cout << {parsedArgument} << '\\n';"
+    return statement + ";" # Bad solution for now
+
+
+def generateCppKeyWord(statement: str):
+    if ("break" in statement):
+        return "break;"
+    if ("return" in statement):
+        return "return;"
     return ""
 
 
@@ -65,12 +98,15 @@ def parseStatement(statement: tuple[str, str]):
         return generateCppAssignment(statement[0])
     if (statType == "functionCall"):
         return generateCppFunctionCall(statement[0])
+    if (statType == "comparison"):
+        return generateCppComparison(statement[0])
+    if (statType == "keyword"):
+        return generateCppKeyWord(statement[0])
     return str(statement[0])
 
 
 def parseStatements(tokenizedFile: list[tuple[str, str]]):
     cppCode = ""
-    print(tokenizedFile)
     mostRecentEndIndex = None
     for i, item in enumerate(tokenizedFile):
         if (mostRecentEndIndex != None and i <= mostRecentEndIndex):
@@ -80,6 +116,11 @@ def parseStatements(tokenizedFile: list[tuple[str, str]]):
             mostRecentEndIndex = loopEndIndex
             cppCode += generateCppLoop(
                 tokenizedFile[i], parseStatements(tokenizedFile[i+1:loopEndIndex]))
+        elif ("ifStatementStart" in item[1]):
+            statementEndIndex = i + parseIfStatements.parseIfStatement(tokenizedFile[i:])
+            mostRecentEndIndex = statementEndIndex
+            cppCode += generateCppLoop(tokenizedFile[i], parseStatements(
+                tokenizedFile[i+1:statementEndIndex]))
         else:
             cppCode += parseStatement(item)
     return cppCode

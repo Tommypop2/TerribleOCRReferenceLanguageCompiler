@@ -1,18 +1,44 @@
+conditions = [">", "<", "==", "!=", ">=", "<="]
+keywords = ["break","return"]
+
+
+def isComparison(statement):
+    for i in conditions:
+        if (i in statement):
+            return True
+    return False
+
+
+def isKeyWord(statement):
+    for i in keywords:
+        if (i in statement):
+            return True
+    return False
+
+
 def getType(statement):
-    if("NEXT " in statement):
+    if ("IF " in statement):
+        return "ifStatementStart"
+    if ("END IF" in statement):
+        return "ifStatementEnd"
+    if ("NEXT " in statement):
         return "forLoopEnd"
-    if("END WHILE" in statement):
+    if ("END WHILE" in statement):
         return "whileLoopEnd"
-    if("FOR " in statement):
+    if ("FOR " in statement):
         return "forLoopStart"
-    if("WHILE " in statement):
+    if ("WHILE " in statement):
         return "whileLoopStart"
-    if("FUNCTION " in statement):
+    if ("FUNCTION " in statement):
         return "functionStart"
-    if("END FUNCTION" in statement):
+    if ("END FUNCTION" in statement):
         return "functionEnd"
-    if("=" in statement):
+    if (isComparison(statement)):
+        return "comparison"
+    if (isKeyWord(statement)):
+        return "keyword"
+    if ("=" in statement):
         return "assignment"
-    if("(" in statement and ")" in statement):
+    if ("(" in statement and ")" in statement):
         return "functionCall"
     return "misc"

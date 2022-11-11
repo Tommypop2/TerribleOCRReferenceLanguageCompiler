@@ -15,8 +15,18 @@ int len(std::vector<int> lst)
     return lst.size();
 }
 auto sum(int n1, int n2) { return (n1 + n2); }
+auto yes(int y) { std::cout << y << '\n'; }
 int main()
 {
     std::srand(time(0));
-    for(auto i = 0; i<9; i++){for(auto n = 1; n<10; n++){std::cout << n << '\n';}}
+    std::vector<int> x = {1, 2, 3};
+    while (true)
+    {
+        if (1 == 1)
+        {
+            std::cout << "Sup Top G" << '\n';
+            yes(x[1]);
+        }
+        break;
+    }
 }
