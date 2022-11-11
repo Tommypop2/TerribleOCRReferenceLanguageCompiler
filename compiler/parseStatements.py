@@ -98,6 +98,12 @@ def generateCppKeyWord(statement: str):
             return f"return({value});"
         return "return;"
     return ""
+def generateCppCode(code: list[tuple[str,str]]):
+    cppCode = ""
+    for i in code:
+        statement = i[0]
+        cppCode += statement
+    return cppCode
 
 
 def parseStatement(statement: tuple[str, str]):
@@ -130,6 +136,11 @@ def parseStatements(tokenizedFile: list[tuple[str, str]]):
             mostRecentEndIndex = statementEndIndex
             cppCode += generateCppLoop(tokenizedFile[i], parseStatements(
                 tokenizedFile[i+1:statementEndIndex]))
+        # elif("cppStatementStart"):
+        #     # statementEndIndex = i + parseIfStatements.parseIfStatement(tokenizedFile[i:])
+        #     # mostRecentEndIndex = statementEndIndex
+        #     # cppCode += generateCppCode(tokenizedFile[i+1:statementEndIndex])
+        #     print("yes")
         else:
             cppCode += parseStatement(item)
     return cppCode
