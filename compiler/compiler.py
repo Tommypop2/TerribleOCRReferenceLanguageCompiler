@@ -68,6 +68,8 @@ def compile(fileName):
         file = f.readlines()
     file = list(map(lambda x: str(x).strip(), file))
     file = list(filter(lambda x: x != "", file))
+    file = list(map(lambda x: x.split("//")[0], file))
+    print(file)
     tokenizedFile = tokenize(file)
     tokenizedFile, functions = getFunctions(tokenizedFile)
     with open("main.cpp", "w") as f:
