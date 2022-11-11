@@ -35,7 +35,7 @@ def generateFunctionCpp(functions: list[list[tuple[str, str]]]):
         functionArguments = i[0][0].split("(")[1].split(")")[0].split(",")
         functionArguments = list(map(lambda x: x.strip(), functionArguments))
         parsedArguments = ""
-        if(functionArguments != [""]):
+        if (functionArguments != [""]):
             for n, item in enumerate(functionArguments):
                 parsedArguments += "int " + parseStatement((item, getType(item))) + (
                     "," if n < len(functionArguments) - 1 else "")

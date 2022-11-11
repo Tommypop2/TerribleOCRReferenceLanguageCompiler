@@ -19,13 +19,15 @@ def generateCppAssignment(statement: str):
         return f"{parsedName} = {parsedValue};"
     if (parsedValue[0] == "[" and parsedValue[len(parsedValue) - 1] == "]"):
         typeOfArray = type(json.loads(parsedValue)[0])
-        if(typeOfArray == str):
+        if (typeOfArray == str):
             typeOfArray = "list: string"
-        if(typeOfArray == int):
+        if (typeOfArray == int):
             typeOfArray = "list: int"
         parsedValue = parsedValue.replace("[", "{", 1)
         parsedValue = (parsedValue[::1].replace("]", "}"))[::1]
         variableType = typeAliases[typeOfArray]
+    if ("[" in parsedName and "]" in parsedName):
+        variableType = ""
     initialisedVariables.append(parsedName)
     return f"{variableType} {parsedName} = {parsedValue};"
 
@@ -37,8 +39,10 @@ def generateCppForLoop(loopStart: tuple[str, str], contents: list[tuple[str, str
     parsedLimit = parseStatement((limit, getType(limit)))
     assignment = val[0].split("FOR")[1].strip()
     parsedAssignment = parseStatement((assignment, getType(assignment)))
+    print(parsedAssignment)
     variableName = parsedAssignment.split("auto")[1].split("=")[0].strip()
-    return f"for({parsedAssignment} {variableName}<{parsedLimit}; {variableName}++){{{contents}}}"
+    semiColon = "" if ";" in parsedLimit else ";"
+    return f"for({parsedAssignment} {variableName}<{parsedLimit}{semiColon} {variableName}++){{{contents}}}"
 
 
 def generateCppWhileLoop(loopStart: str, contents):
@@ -77,17 +81,21 @@ def generateCppLoop(loopStart, contents):
 
 
 def generateCppFunctionCall(statement: str):
-    argument = statement.split("(")[1].split(")")[0]
-    parsedArgument = parseStatement((argument, getType(argument)))
+    print(statement)
     if (statement.split("(")[0].strip() == "print"):
+        argument = statement.replace("print(", "")[0:-1]
+        parsedArgument = parseStatement((argument, getType(argument)))
         return f"std::cout << {parsedArgument} << '\\n';"
-    return statement + ";" # Bad solution for now
+    return statement  # Bad solution for now
 
 
 def generateCppKeyWord(statement: str):
     if ("break" in statement):
         return "break;"
     if ("return" in statement):
+        if ("(" in statement and ")" in statement):
+            value = statement.split("(")[1].split(")")[0]
+            return f"return({value});"
         return "return;"
     return ""
 
@@ -117,7 +125,8 @@ def parseStatements(tokenizedFile: list[tuple[str, str]]):
             cppCode += generateCppLoop(
                 tokenizedFile[i], parseStatements(tokenizedFile[i+1:loopEndIndex]))
         elif ("ifStatementStart" in item[1]):
-            statementEndIndex = i + parseIfStatements.parseIfStatement(tokenizedFile[i:])
+            statementEndIndex = i + \
+                parseIfStatements.parseIfStatement(tokenizedFile[i:])
             mostRecentEndIndex = statementEndIndex
             cppCode += generateCppLoop(tokenizedFile[i], parseStatements(
                 tokenizedFile[i+1:statementEndIndex]))

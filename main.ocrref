@@ -1,12 +1,30 @@
-x = [1,2, 3]
-FUNCTION yes(y)
-    print(y)
+
+FUNCTION bubbleSort()
+    x = [3,2,1]
+    WHILE true
+        swaps = 0
+        FOR i = 1 TO len(x)
+            IF x[i-1] > x[i]
+                temp = x[i-1]
+                x[i-1] = x[i]
+                x[i] = temp
+                swaps = swaps + 1
+            END IF
+        NEXT i
+        IF swaps == 0
+            break
+        END IF
+    END WHILE
+    return(x)
 END FUNCTION
 
 WHILE true
     IF 1 == 1
         print("Sup Top G")
-        yes(x[1])
+        result = bubbleSort()
+        FOR n = 0 TO len(result)
+            print(result[n])
+        NEXT n
     END IF
     break //This is pretty cool
 END WHILE
