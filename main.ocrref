@@ -1,4 +1,3 @@
-
 FUNCTION bubbleSort()
     x = [3,2,1]
     WHILE true
@@ -17,14 +16,21 @@ FUNCTION bubbleSort()
     END WHILE
     return(x)
 END FUNCTION
-
-WHILE true
-    IF 1 == 1
-        print("Sup Top G")
-        result = bubbleSort()
-        FOR n = 0 TO len(result)
-            print(result[n])
-        NEXT n
-    END IF
-    break //This is pretty cool
-END WHILE
+CPPCode
+    int x = 2;
+END CPPCode
+FUNCTION main()
+    WHILE true
+        IF 1 == 1
+            print("Sup Top G")
+            result = bubbleSort()
+            FOR n = 0 TO len(result)
+                print(result[n])
+                CPPCode
+                    std::cout << "This is awesome" << "\n";
+                END CPPCode
+            NEXT n
+        END IF
+        break //This is pretty cool
+    END WHILE
+END FUNCTION

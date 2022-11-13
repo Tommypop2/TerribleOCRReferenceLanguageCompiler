@@ -33,10 +33,10 @@ def getType(statement):
         return "functionStart"
     if ("END FUNCTION" in statement):
         return "functionEnd"
-    if("CPPCode" in statement):
-        return "cppStatementStart"
     if("END CPPCode" in statement):
         return "cppStatementEnd"
+    if("CPPCode" in statement):
+        return "cppStatementStart"
     if (isComparison(statement)):
         return "comparison"
     if (isKeyWord(statement)):

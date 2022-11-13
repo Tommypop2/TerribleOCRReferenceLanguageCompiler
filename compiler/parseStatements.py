@@ -1,10 +1,10 @@
 import json
 from compiler import parseLoops
+from compiler.getCppType import getCppType
 from compiler.getType import getType
 from compiler import parseIfStatements
-typeAliases = {str.__name__: "std::string", int.__name__: "std::int",
-               "list: string": "std::vector<std::string>", "list: int": "std::vector<int>"}
-initialisedVariables = []
+
+variables = {}
 conditions = [">", "<", "==", "!=", ">=", "<="]
 
 
@@ -15,20 +15,15 @@ def generateCppAssignment(statement: str):
     parsedName = parseStatement((variableName, getType(variableName)))
     parsedValue = parseStatement((variableValue, getType(variableValue)))
     variableType = "auto"
-    if (parsedName in initialisedVariables):
+    if (parsedName in variables):
         return f"{parsedName} = {parsedValue};"
-    if (parsedValue[0] == "[" and parsedValue[len(parsedValue) - 1] == "]"):
-        typeOfArray = type(json.loads(parsedValue)[0])
-        if (typeOfArray == str):
-            typeOfArray = "list: string"
-        if (typeOfArray == int):
-            typeOfArray = "list: int"
+    variableType = getCppType(parsedValue)
+    variables[parsedName] = variableType
+    if ("std::vector" in variableType):
         parsedValue = parsedValue.replace("[", "{", 1)
         parsedValue = (parsedValue[::1].replace("]", "}"))[::1]
-        variableType = typeAliases[typeOfArray]
     if ("[" in parsedName and "]" in parsedName):
         variableType = ""
-    initialisedVariables.append(parsedName)
     return f"{variableType} {parsedName} = {parsedValue};"
 
 
@@ -39,7 +34,6 @@ def generateCppForLoop(loopStart: tuple[str, str], contents: list[tuple[str, str
     parsedLimit = parseStatement((limit, getType(limit)))
     assignment = val[0].split("FOR")[1].strip()
     parsedAssignment = parseStatement((assignment, getType(assignment)))
-    print(parsedAssignment)
     variableName = parsedAssignment.split("auto")[1].split("=")[0].strip()
     semiColon = "" if ";" in parsedLimit else ";"
     return f"for({parsedAssignment} {variableName}<{parsedLimit}{semiColon} {variableName}++){{{contents}}}"
@@ -66,7 +60,6 @@ def generateCppComparison(condition: str):
 def generateCppIfStatement(statementStart: str, contents):
     condition = statementStart[0].split("IF")[1].strip()
     parsedCondition = parseStatement((condition, "comparison"))
-    # print(f"{statementStart}, {contents}")
     return f"if({parsedCondition}) {{{contents}}}"
 
 
@@ -81,7 +74,6 @@ def generateCppLoop(loopStart, contents):
 
 
 def generateCppFunctionCall(statement: str):
-    print(statement)
     if (statement.split("(")[0].strip() == "print"):
         argument = statement.replace("print(", "")[0:-1]
         parsedArgument = parseStatement((argument, getType(argument)))
@@ -98,7 +90,9 @@ def generateCppKeyWord(statement: str):
             return f"return({value});"
         return "return;"
     return ""
-def generateCppCode(code: list[tuple[str,str]]):
+
+
+def generateCppCode(code: list[tuple[str, str]]):
     cppCode = ""
     for i in code:
         statement = i[0]
@@ -136,11 +130,12 @@ def parseStatements(tokenizedFile: list[tuple[str, str]]):
             mostRecentEndIndex = statementEndIndex
             cppCode += generateCppLoop(tokenizedFile[i], parseStatements(
                 tokenizedFile[i+1:statementEndIndex]))
-        # elif("cppStatementStart"):
-        #     # statementEndIndex = i + parseIfStatements.parseIfStatement(tokenizedFile[i:])
-        #     # mostRecentEndIndex = statementEndIndex
-        #     # cppCode += generateCppCode(tokenizedFile[i+1:statementEndIndex])
-        #     print("yes")
+        elif("cppStatementStart" in item[1]):
+            statementEndIndex = i + parseIfStatements.parseIfStatement(tokenizedFile[i:])
+            mostRecentEndIndex = statementEndIndex
+            cppCode += generateCppCode(tokenizedFile[i+1:statementEndIndex])
+            # print("yes")
         else:
             cppCode += parseStatement(item)
+    # print(variables)
     return cppCode

@@ -7,6 +7,7 @@ template = """
 #include <time.h>
 #include <string>
 #include <vector>
+std::string _ = "#includes";
 std::string getInput(std::string prompt)
 {
     std::cout << prompt;
@@ -19,13 +20,15 @@ int len(std::vector<int> lst)
     return lst.size();
 }
 auto sum(int n1, int n2) { return (n1 + n2); }
+"actualCode";
 "functions";
-int main()
-{
-    std::srand(time(0));
-    "actualCode";
-}
 """
+templateLst = list(map(lambda x: x.strip() +
+                   ("\n" if "#include" in x else ""), template.split("\n")))
+template = ""
+for i in templateLst:
+    template += i
+print(template)
 
 
 def generateFunctionCpp(functions: list[list[tuple[str, str]]]):
@@ -40,7 +43,10 @@ def generateFunctionCpp(functions: list[list[tuple[str, str]]]):
                 parsedArguments += "int " + parseStatement((item, getType(item))) + (
                     "," if n < len(functionArguments) - 1 else "")
         parsedContents = parseStatements(i[1:-1])
-        cppCode += f"auto {functionName}({parsedArguments}){{{parsedContents}}}"
+        functionType = "auto"
+        if (functionName == "main"):
+            functionType = "int"
+        cppCode += f"{functionType} {functionName}({parsedArguments}){{{parsedContents}}}"
     return cppCode
 
 
@@ -69,10 +75,22 @@ def compile(fileName):
     file = list(map(lambda x: str(x).strip(), file))
     file = list(filter(lambda x: x != "", file))
     file = list(map(lambda x: x.split("//")[0], file))
-    print(file)
     tokenizedFile = tokenize(file)
     tokenizedFile, functions = getFunctions(tokenizedFile)
+    noMainFunc = False
+    for i in functions:
+        if ("main()" in i[0][0]):
+            break
+    else:
+        print("no main func")
+        noMainFunc = True
+    inlineCode = parseStatements(tokenizedFile)
+    functionsCode = generateFunctionCpp(functions)
+    includes = ""
+    if (noMainFunc):
+        inlineCode = f"int main(){{{inlineCode}}}"
+        inlineCode, functionsCode = functionsCode, inlineCode
     with open("main.cpp", "w") as f:
         codeToWrite = template.replace(
-            '"actualCode";', parseStatements(tokenizedFile)).replace('"functions";', generateFunctionCpp(functions))
+            '"actualCode";', inlineCode).replace('"functions";', functionsCode).replace('std::string _ = "#includes";', includes)
         f.write(codeToWrite)
